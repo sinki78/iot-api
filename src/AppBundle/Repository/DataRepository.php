@@ -10,4 +10,32 @@ namespace AppBundle\Repository;
  */
 class DataRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function findAllByType($type){
+        $result = $this->createQueryBuilder('d')
+            ->where('d.type = :type')
+            ->setParameter("type", $type)
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
+
+    public function findByLocalisation($latitude, $longitude,$deltaLat, $deltaLon){
+        $minLat = $latitude - $deltaLat;
+        $maxLat = $latitude + $deltaLat;
+        $minLon = $longitude - $deltaLon;
+        $maxLon = $longitude + $deltaLon;
+
+        $result = $this->createQueryBuilder('d')
+            ->where('d.latitude BETWEEN :minLat AND :maxLat')
+            ->AndWhere('d.longitude BETWEEN :minLon AND :maxLon')
+            ->setParameter("minLat", $minLat)
+            ->setParameter("maxLat", $maxLat)
+            ->setParameter("minLon", $minLon)
+            ->setParameter("maxLon", $maxLon)
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
 }

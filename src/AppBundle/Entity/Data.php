@@ -45,16 +45,33 @@ class Data
     /**
      * @var string
      *
-     * @ORM\Column(name="gaz", type="string", length=255)
+     * @ORM\Column(name="type", type="string", length=255)
      */
-    private $gaz;
+    private $type;
+
 
     /**
      * @var string
      *
-     * @ORM\Column(name="particule_fine", type="string", length=255)
+     * @ORM\Column(name="valeur", type="string", length=255)
      */
-    private $particuleFine;
+    private $valeur;
+
+    /**
+     * @return string
+     */
+    public function getValeur()
+    {
+        return $this->valeur;
+    }
+
+    /**
+     * @param string $valeur
+     */
+    public function setValeur($valeur)
+    {
+        $this->valeur = $valeur;
+    }
 
 
     /**
@@ -139,52 +156,25 @@ class Data
         return $this->latitude;
     }
 
-    /**
-     * Set gaz
-     *
-     * @param string $gaz
-     *
-     * @return Data
-     */
-    public function setGaz($gaz)
-    {
-        $this->gaz = $gaz;
 
-        return $this;
-    }
 
     /**
-     * Get gaz
-     *
      * @return string
      */
-    public function getGaz()
+    public function getType()
     {
-        return $this->gaz;
+        return $this->type;
     }
 
     /**
-     * Set particuleFine
-     *
-     * @param string $particuleFine
-     *
-     * @return Data
+     * @param string $type
      */
-    public function setParticuleFine($particuleFine)
+    public function setType($type)
     {
-        $this->particuleFine = $particuleFine;
-
-        return $this;
+        $this->type = $type;
     }
 
-    /**
-     * Get particuleFine
-     *
-     * @return string
-     */
-    public function getParticuleFine()
-    {
-        return $this->particuleFine;
-    }
+
+
 }
 
