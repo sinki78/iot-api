@@ -130,11 +130,7 @@ class DataController extends Controller
 
 
         }
+        return new JsonResponse('success');
     }
-}
-}
-
-return new JsonResponse('success');
-}
 
 }
