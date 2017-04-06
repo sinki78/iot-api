@@ -98,7 +98,7 @@ class DataController extends Controller
                     switch ($key){
                         case 'date':
                             $transitionToDst=$value;
-                            $date = new DateTime($transitionToDst, new \DateTimeZone('Europe/Paris'));
+                            $date = new DateTime($transitionToDst);
                             $CO2->setDate($date);
                             $PF->setDate($date);
                             break;
