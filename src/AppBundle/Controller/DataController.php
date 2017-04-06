@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 
@@ -71,6 +72,17 @@ class DataController extends Controller
             $line['valeur'] = $data->getValeur();
             $result[] = $line;
         }
+        return new JsonResponse($result);
+    }
+
+
+    /**
+     * @Route("/setData")
+     * @Method({"POST"})
+     */
+    public function postLocalisation(Request $request)
+    {
+        dump($request->request->getData());die;
         return new JsonResponse($result);
     }
 }
