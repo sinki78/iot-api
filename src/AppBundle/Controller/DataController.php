@@ -22,11 +22,11 @@ class DataController extends Controller
      * @Route("/getAll")
      * @Method({"GET","HEAD"})
      */
-    public function getAll($latitude = '48.856614',$longitude = '2.352222',$deltaLatitude = '1',$deltaLongitude = '1',$dateMin = NULL,$dateMax = NULL,$typeData = 'PF')
+    public function getAll($latitude = '48.856614', $longitude = '2.352222', $deltaLatitude = '1', $deltaLongitude = '1', $dateMin = NULL, $dateMax = NULL, $typeData = 'PF')
     {
         $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findAll();
         $result = [];
-        foreach ($datas as $key => $data){
+        foreach ($datas as $key => $data) {
             $line['date'] = $data->getDate();
             $line['longitude'] = $data->getLongitude();
             $line['latitude'] = $data->getLatitude();
@@ -42,11 +42,11 @@ class DataController extends Controller
      * @Route("/getAllByType/{typeData}")
      * @Method({"GET","HEAD"})
      */
-    public function getAllByType($latitude = '48.856614',$longitude = '2.352222',$deltaLatitude = '1',$deltaLongitude = '1',$dateMin = NULL,$dateMax = NULL,$typeData = 'PF')
+    public function getAllByType($latitude = '48.856614', $longitude = '2.352222', $deltaLatitude = '1', $deltaLongitude = '1', $dateMin = NULL, $dateMax = NULL, $typeData = 'PF')
     {
         $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findAllByType($typeData);
         $result = [];
-        foreach ($datas as $key => $data){
+        foreach ($datas as $key => $data) {
             $line['date'] = $data->getDate();
             $line['longitude'] = $data->getLongitude();
             $line['latitude'] = $data->getLatitude();
@@ -56,18 +56,17 @@ class DataController extends Controller
 
         return new JsonResponse($result);
     }
-
 
 
     /**
      * @Route("/getByLocalisation/{latitude}/{longitude}/{deltaLat}/{deltaLon}")
      * @Method({"GET","HEAD"})
      */
-    public function getByLocalisation($latitude = '48.856614',$longitude = '2.352222',$deltaLat = '1',$deltaLon = '1',$dateMin = NULL,$dateMax = NULL,$typeData = 'PF')
+    public function getByLocalisation($latitude = '48.856614', $longitude = '2.352222', $deltaLat = '1', $deltaLon = '1', $dateMin = NULL, $dateMax = NULL, $typeData = 'PF')
     {
-        $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findByLocalisation($latitude,$longitude,$deltaLat,$deltaLon);
+        $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findByLocalisation($latitude, $longitude, $deltaLat, $deltaLon);
         $result = [];
-        foreach ($datas as $key => $data){
+        foreach ($datas as $key => $data) {
             $line['date'] = $data->getDate();
             $line['longitude'] = $data->getLongitude();
             $line['latitude'] = $data->getLatitude();
@@ -76,7 +75,6 @@ class DataController extends Controller
         }
         return new JsonResponse($result);
     }
-
 
 
     /**
@@ -86,49 +84,57 @@ class DataController extends Controller
     public function postLocalisation(Request $request)
     {
         $content = $request->getContent();
-        if (!empty($content))
-        {
+        if (!empty($content)) {
             $params = json_decode($content, true); // 2nd param to get as array
 
-            foreach ($params as $line){
-                foreach ($line as $key=>$value){
+            foreach ($params as $line) {
 
-                    $CO2 = new Data();
-                    $PF = new Data();
-                    switch ($key){
-                        case 'date':
-                            $transitionToDst=$value;
-                            $date = new \DateTime($transitionToDst);
-                            $CO2->setDate($date);
-                            $PF->setDate($date);
-                            break;
-                        case 'lon':
-                            $CO2->setLongitude($value);
-                            $PF->setLongitude($value);
-                            break;
-                        case 'lat':
-                            $CO2->setLatitude($value);
-                            $PF->setLatitude($value);
-                            break;
-                        case 'co2':
-                            $CO2->setType($key);
-                            $CO2->setValeur($value);
-                            break;
-                        case 'pf':
-                            $PF->setType($key);
-                            $PF->setValeur($value);
-                            break;
+                $CO2 = new Data();
+                $PF = new Data();
+                foreach ($line as $key => $value) {
 
+                    if ($key == 'date') {
+                        $transitionToDst = $value;
+                        $date = new \DateTime($transitionToDst);
+                        $CO2->setDate($date);
+                        $PF->setDate($date);
                     }
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($CO2);
-                    $em->persist($PF);
-                    $em->flush();
-                }
-            }
-        }
 
-        return new JsonResponse('success');
+                    if ($key == 'lon') {
+                        $CO2->setLongitude($value);
+                        $PF->setLongitude($value);
+                    }
+                    if ($key == 'lat') {
+                        $CO2->setLatitude($value);
+                        $PF->setLatitude($value);
+                    }
+                    if ($key == 'co2') {
+
+                        $CO2->setType($key);
+                        $CO2->setValeur($value);
+                    }
+                    if ($key == 'pf') {
+
+                        $PF->setType($key);
+                        $PF->setValeur($value);
+                    }
+
+                }
+
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($CO2);
+                $em->persist($PF);
+                $em->flush();
+
+            }
+
+
+        }
     }
+}
+}
+
+return new JsonResponse('success');
+}
 
 }
