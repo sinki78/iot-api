@@ -6,6 +6,7 @@ use AppBundle\Entity\Data;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Constraints\DateTime;
@@ -95,7 +96,12 @@ class DataController extends Controller
 
                     if ($key == 'date') {
                         $transitionToDst = $value;
-                        $date = new \DateTime($transitionToDst);
+                        try{
+                            $date = new \DateTime($transitionToDst);
+
+                        } catch (Exception $e){
+                            return new JsonResponse($e);
+                        }
                         $CO2->setDate($date);
                         $PF->setDate($date);
                     }
@@ -108,14 +114,14 @@ class DataController extends Controller
                         $CO2->setLatitude($value);
                         $PF->setLatitude($value);
                     }
-                    if ($key == 'co2') {
+                    if ($key == 'co2' || $key == 'CO2') {
 
-                        $CO2->setType($key);
+                        $CO2->setType(strtoupper($key));
                         $CO2->setValeur($value);
                     }
-                    if ($key == 'pf') {
+                    if ($key == 'pf' || $key == 'PF') {
 
-                        $PF->setType($key);
+                        $PF->setType(strtoupper($key));
                         $PF->setValeur($value);
                     }
 
