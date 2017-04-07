@@ -137,7 +137,7 @@ class DataController extends Controller
 
                     $em->flush();
                 } catch (ConstraintViolationException $e){
-                    return new JsonResponse('git add .Estatus code 400');
+                    return new JsonResponse('Estatus code 400');
                 }
 
 
