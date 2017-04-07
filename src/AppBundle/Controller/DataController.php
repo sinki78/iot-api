@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
 
@@ -36,7 +37,6 @@ class DataController extends Controller
             $result[] = $line;
         }
 
-        dump($result);die;
         return new JsonResponse($result);
     }
 
@@ -137,7 +137,7 @@ class DataController extends Controller
 
                     $em->flush();
                 } catch (ConstraintViolationException $e){
-                    return new JsonResponse('Estatus code 400');
+                    return new Response('Estatus code 400',400);
                 }
 
 
