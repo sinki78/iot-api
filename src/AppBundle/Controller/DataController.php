@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Constraints\DateTime;
-
+use Doctrine\DBAL\Exception\ConstraintViolationException;
 
 /**
  * @Route("/api")
@@ -36,6 +36,7 @@ class DataController extends Controller
             $result[] = $line;
         }
 
+        dump($result);die;
         return new JsonResponse($result);
     }
 
@@ -54,7 +55,6 @@ class DataController extends Controller
             $line['valeur'] = $data->getValeur();
             $result[] = $line;
         }
-
         return new JsonResponse($result);
     }
 
@@ -107,9 +107,12 @@ class DataController extends Controller
                     }
 
                     if ($key == 'lon') {
+
                         $CO2->setLongitude($value);
                         $PF->setLongitude($value);
                     }
+
+
                     if ($key == 'lat') {
                         $CO2->setLatitude($value);
                         $PF->setLatitude($value);
@@ -128,9 +131,15 @@ class DataController extends Controller
                 }
 
                 $em = $this->getDoctrine()->getManager();
-                $em->persist($CO2);
-                $em->persist($PF);
-                $em->flush();
+                try{
+                    $em->persist($CO2);
+                    $em->persist($PF);
+
+                    $em->flush();
+                } catch (ConstraintViolationException $e){
+                    return new JsonResponse('git add .Estatus code 400');
+                }
+
 
             }
 

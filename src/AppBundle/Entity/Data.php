@@ -31,14 +31,14 @@ class Data
     /**
      * @var string
      *
-     * @ORM\Column(name="longitude", type="string", length=255)
+     * @ORM\Column(name="longitude", type="float", length=255)
      */
     private $longitude;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="latitude", type="string", length=255)
+     * @ORM\Column(name="latitude", type="float", length=255)
      */
     private $latitude;
 
@@ -53,7 +53,7 @@ class Data
     /**
      * @var string
      *
-     * @ORM\Column(name="valeur", type="string", length=255)
+     * @ORM\Column(name="valeur", type="float", length=255)
      */
     private $valeur;
 
