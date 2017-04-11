@@ -38,4 +38,88 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
 
         return $result;
     }
+
+
+    public function findWithDelta($latitude, $longitude,$deltaLat, $deltaLon){
+        $minLat = $latitude - $deltaLat;
+        $maxLat = $latitude + $deltaLat;
+        $minLon = $longitude - $deltaLon;
+        $maxLon = $longitude + $deltaLon;
+
+        $result = $this->createQueryBuilder('d')
+            ->where('d.latitude BETWEEN :minLat AND :maxLat')
+            ->AndWhere('d.longitude BETWEEN :minLon AND :maxLon')
+            ->setParameter("minLat", $minLat)
+            ->setParameter("maxLat", $maxLat)
+            ->setParameter("minLon", $minLon)
+            ->setParameter("maxLon", $maxLon)
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
+    public function findWithDeltaType($latitude, $longitude,$deltaLat, $deltaLon, $type){
+        $minLat = $latitude - $deltaLat;
+        $maxLat = $latitude + $deltaLat;
+        $minLon = $longitude - $deltaLon;
+        $maxLon = $longitude + $deltaLon;
+
+        $result = $this->createQueryBuilder('d')
+            ->where('d.latitude BETWEEN :minLat AND :maxLat')
+            ->AndWhere('d.longitude BETWEEN :minLon AND :maxLon')
+            ->AndWhere('d.type = :type')
+            ->setParameter("minLat", $minLat)
+            ->setParameter("maxLat", $maxLat)
+            ->setParameter("minLon", $minLon)
+            ->setParameter("maxLon", $maxLon)
+            ->setParameter("type", $type)
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
+    public function findWithDeltaDateType($latitude, $longitude,$deltaLat, $deltaLon,$dateD,$dateF, $type){
+        $minLat = $latitude - $deltaLat;
+        $maxLat = $latitude + $deltaLat;
+        $minLon = $longitude - $deltaLon;
+        $maxLon = $longitude + $deltaLon;
+
+        $result = $this->createQueryBuilder('d')
+            ->where('d.latitude BETWEEN :minLat AND :maxLat')
+            ->AndWhere('d.longitude BETWEEN :minLon AND :maxLon')
+            ->AndWhere('d.date BETWEEN :dateD AND :dateF')
+            ->AndWhere('d.type = :type')
+            ->setParameter("minLat", $minLat)
+            ->setParameter("maxLat", $maxLat)
+            ->setParameter("minLon", $minLon)
+            ->setParameter("maxLon", $maxLon)
+            ->setParameter("dateD", $dateD)
+            ->setParameter("dateF", $dateF)
+            ->setParameter("type", $type)
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
+    public function findWithDeltaDate($latitude, $longitude,$deltaLat, $deltaLon,$dateD,$dateF){
+        $minLat = $latitude - $deltaLat;
+        $maxLat = $latitude + $deltaLat;
+        $minLon = $longitude - $deltaLon;
+        $maxLon = $longitude + $deltaLon;
+
+        $result = $this->createQueryBuilder('d')
+            ->where('d.latitude BETWEEN :minLat AND :maxLat')
+            ->AndWhere('d.longitude BETWEEN :minLon AND :maxLon')
+            ->AndWhere('d.date BETWEEN :dateD AND :dateF')
+            ->setParameter("minLat", $minLat)
+            ->setParameter("maxLat", $maxLat)
+            ->setParameter("minLon", $minLon)
+            ->setParameter("maxLon", $maxLon)
+            ->setParameter("dateD", $dateD)
+            ->setParameter("dateF", $dateF)
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
 }

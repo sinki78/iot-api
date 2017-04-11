@@ -76,7 +76,68 @@ class DataController extends Controller
         }
         return new JsonResponse($result);
     }
+//{long}{dLat}{dLong}{dateD}{dateF}{type}
+    /**
+     * @Route("/getBy/")
+     * @Method({"GET"})
+     */
+    public function getBy(Request $request)
+    {
+        $lat = $request->query->get('lat');
+        $long = $request->query->get('long');
+        $dLat = $request->query->get('dLat');
+        $dLong = $request->query->get('dLong');
+        $dateD = $request->query->get('dateD');
+        $dateF = $request->query->get('dateF');
+        $type = $request->query->get('type');
 
+        if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD == NULL && $dateF == NULL && $type == NULL){
+            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDelta($lat,$long,$dLat,$dLong);
+        }
+        if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD == NULL && $dateF == NULL && $type != NULL){
+            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDeltaType($lat,$long,$dLat,$dLong,$type);
+        }
+        else if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD != NULL && $dateF == NULL && $type == NULL){
+            $dateF = new \DateTime();
+            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDeltaDate($lat,$long,$dLat,$dLong,$dateD,$dateF);
+        }
+        else if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD != NULL && $dateF != NULL && $type == NULL){
+            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDeltaDate($lat,$long,$dLat,$dLong,$dateD,$dateF);
+        }
+        else if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD == NULL && $dateF == NULL && $type != NULL){
+            $dateF = new \DateTime();
+            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDeltaDateType($lat,$long,$dLat,$dLong,$dateD,$dateF,$type);
+        }
+
+        else if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD != NULL && $dateF != NULL && $type != NULL){
+            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDeltaDateType($lat,$long,$dLat,$dLong,$dateD,$dateF,$type);
+        }
+        $result = [];
+        foreach ($datas as $key => $data) {
+            $line['date'] = $data->getDate();
+            $line['longitude'] = $data->getLongitude();
+            $line['latitude'] = $data->getLatitude();
+            $line['type'] = $data->getType();
+            $line['valeur'] = $data->getValeur();
+            $result[] = $line;
+        }
+
+        dump($result);die;
+
+//        return new JsonResponse($result);
+
+
+//        $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findByLocalisation($latitude, $longitude, $deltaLat, $deltaLon);
+//        $result = [];
+//        foreach ($datas as $key => $data) {
+//            $line['date'] = $data->getDate();
+//            $line['longitude'] = $data->getLongitude();
+//            $line['latitude'] = $data->getLatitude();
+//            $line['valeur'] = $data->getValeur();
+//            $result[] = $line;
+//        }
+//        return new JsonResponse($result);
+    }
 
     /**
      * @Route("/setData")
