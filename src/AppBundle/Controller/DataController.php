@@ -122,21 +122,9 @@ class DataController extends Controller
             $result[] = $line;
         }
 
-        dump($result);die;
+        //dump($result);die;
 
-//        return new JsonResponse($result);
-
-
-//        $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findByLocalisation($latitude, $longitude, $deltaLat, $deltaLon);
-//        $result = [];
-//        foreach ($datas as $key => $data) {
-//            $line['date'] = $data->getDate();
-//            $line['longitude'] = $data->getLongitude();
-//            $line['latitude'] = $data->getLatitude();
-//            $line['valeur'] = $data->getValeur();
-//            $result[] = $line;
-//        }
-//        return new JsonResponse($result);
+         return new JsonResponse($result);
     }
 
     /**
