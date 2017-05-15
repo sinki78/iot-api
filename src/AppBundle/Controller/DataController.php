@@ -46,7 +46,11 @@ class DataController extends Controller
      */
     public function getAllByType($latitude = '48.856614', $longitude = '2.352222', $deltaLatitude = '1', $deltaLongitude = '1', $dateMin = NULL, $dateMax = NULL, $typeData = 'PF')
     {
+
+
+
         $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findAllByType($typeData);
+	
         $result = [];
         foreach ($datas as $key => $data) {
             $line['date'] = $data->getDate();
@@ -83,6 +87,8 @@ class DataController extends Controller
      */
     public function getBy(Request $request)
     {
+
+	ini_set("memory_limit","512M");
         $lat = $request->query->get('lat');
         $long = $request->query->get('long');
         $dLat = $request->query->get('dLat');
@@ -90,9 +96,27 @@ class DataController extends Controller
         $dateD = $request->query->get('dateD');
         $dateF = $request->query->get('dateF');
         $type = $request->query->get('type');
+	$lat = (int)$lat;
+	$long = (int)$long;
+	$dLat =(int)$dLat;
+	$dLong = (int)$dLong;
+
+        $dbh = new \PDO('mysql:host=localhost;dbname=iotapi', 'iotapi', 'iotapi');
+
+        $minLat = $lat - $dLat;
+        $maxLat = $lat + $dLat;
+        $minLon = $long - $dLong;
+        $maxLon = $long + $dLong;
+
+        $rs = $dbh->prepare("SELECT 'id' FROM 'iotapi' WHERE 'latitude' BETWEEN :minLat AND :maxLat AND 'longitude' BETWEEN :minLon AND :maxLon AND 'type' = :type LIMIT 1000");
+        $rs->execute([':minLat' => $minLat, ':maxLat' => $maxLat, ':minLon' => $minLon, ':maxLon' => $maxLon, ':type' => $type]);
+        $result = $rs->fetchAll();
+        dump($result);die;
 
         if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD == NULL && $dateF == NULL && $type == NULL){
-            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDelta($lat,$long,$dLat,$dLong);
+            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDelta((int)$lat,(int)$long,(int)$dLat,(int)$dLong);
+
+
         }
         if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD == NULL && $dateF == NULL && $type != NULL){
             $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDeltaType($lat,$long,$dLat,$dLong,$type);
@@ -122,9 +146,22 @@ class DataController extends Controller
             $result[] = $line;
         }
 
-        //dump($result);die;
 
-         return new JsonResponse($result);
+
+
+        return new JsonResponse($result);
+
+
+//        $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findByLocalisation($latitude, $longitude, $deltaLat, $deltaLon);
+//        $result = [];
+//        foreach ($datas as $key => $data) {
+//            $line['date'] = $data->getDate();
+//            $line['longitude'] = $data->getLongitude();
+//            $line['latitude'] = $data->getLatitude();
+//            $line['valeur'] = $data->getValeur();
+//            $result[] = $line;
+//        }
+//        return new JsonResponse($result);
     }
 
     /**

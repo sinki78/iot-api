@@ -14,7 +14,8 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
         $result = $this->createQueryBuilder('d')
             ->where('d.type = :type')
             ->setParameter("type", $type)
-            ->getQuery()
+            ->setMaxResults(150000)
+	    ->getQuery()
             ->getResult();
 
         return $result;
@@ -33,6 +34,7 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter("maxLat", $maxLat)
             ->setParameter("minLon", $minLon)
             ->setParameter("maxLon", $maxLon)
+	    ->setMaxResults(150000)
             ->getQuery()
             ->getResult();
 
@@ -53,6 +55,7 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter("maxLat", $maxLat)
             ->setParameter("minLon", $minLon)
             ->setParameter("maxLon", $maxLon)
+            ->setMaxResults(150000)
             ->getQuery()
             ->getResult();
 
@@ -73,6 +76,7 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter("minLon", $minLon)
             ->setParameter("maxLon", $maxLon)
             ->setParameter("type", $type)
+            ->setMaxResults(150000)
             ->getQuery()
             ->getResult();
 
@@ -96,6 +100,7 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter("dateD", $dateD)
             ->setParameter("dateF", $dateF)
             ->setParameter("type", $type)
+	    ->setMaxResults(150000)
             ->getQuery()
             ->getResult();
 
@@ -117,9 +122,11 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter("maxLon", $maxLon)
             ->setParameter("dateD", $dateD)
             ->setParameter("dateF", $dateF)
+            ->setMaxResults(150000)
             ->getQuery()
             ->getResult();
 
         return $result;
     }
 }
+

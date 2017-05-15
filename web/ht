@@ -51,9 +51,12 @@ DirectoryIndex app.php
     # If the requested filename exists, simply serve it.
     # We only want to let Apache serve files and not directories.
     RewriteCond %{REQUEST_FILENAME} -f
-    RewriteRule ^ - [L]
+        RewriteCond %{HTTP_HOST} ^cgportfolio.ddns.net
+        RewriteRule ^ - [L]
 
     # Rewrite all other queries to the front controller.
+    RewriteCond %{HTTP_HOST} ^cgportfolio.ddns.net
+
     RewriteRule ^ %{ENV:BASE}/app.php [L]
 </IfModule>
 
