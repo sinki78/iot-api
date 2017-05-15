@@ -112,10 +112,13 @@ class DataController extends Controller
         $minLon = $long - $dLong;
         $maxLon = $long + $dLong;
 
-        $rs = $dbh->prepare("SELECT 'id' FROM 'iotapi' WHERE 'latitude' BETWEEN :minLat AND :maxLat AND 'longitude' BETWEEN :minLon AND :maxLon AND 'type' = :type LIMIT 1000");
+        $rs = $dbh->prepare("SELECT 'id' FROM 'iotapi.data' WHERE 'latitude' BETWEEN :minLat AND :maxLat AND 'longitude' BETWEEN :minLon AND :maxLon AND 'type' = :type LIMIT 1000");
         $rs->execute([':minLat' => $minLat, ':maxLat' => $maxLat, ':minLon' => $minLon, ':maxLon' => $maxLon, ':type' => $type]);
         $result = $rs->fetchAll();
-        dump($result);die;
+        dump($result);
+        $sansCond = $dbh->prepare("SELECT 'id' FROM 'iotapi.data' LIMIT 1000");
+        $result2 = $sansCond->fetchAll();
+        dump($result2);die;
 
         if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD == NULL && $dateF == NULL && $type == NULL){
             $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDelta((int)$lat,(int)$long,(int)$dLat,(int)$dLong);
