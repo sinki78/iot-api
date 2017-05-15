@@ -101,8 +101,12 @@ class DataController extends Controller
 	$dLat =(int)$dLat;
 	$dLong = (int)$dLong;
 
+        try {
         $dbh = new \PDO('mysql:host=localhost;dbname=iotapi', 'iotapi', 'iotapi');
-
+        } catch (\PDOException $e) {
+            print "Erreur !: " . $e->getMessage() . "<br/>";
+            die();
+        }
         $minLat = $lat - $dLat;
         $maxLat = $lat + $dLat;
         $minLon = $long - $dLong;
