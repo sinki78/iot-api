@@ -45,9 +45,9 @@ class Data
     /**
      * @var string
      *
-     * @ORM\Column(name="type", type="string", length=255)
+     * @ORM\Column(name="dtype", type="string", length=255)
      */
-    private $type;
+    private $dtype;
 
 
     /**
@@ -161,17 +161,17 @@ class Data
     /**
      * @return string
      */
-    public function getType()
+    public function getDtype()
     {
-        return $this->type;
+        return $this->dtype;
     }
 
     /**
      * @param string $type
      */
-    public function setType($type)
+    public function setDtype($dtype)
     {
-        $this->type = $type;
+        $this->dtype = $dtype;
     }
 
 

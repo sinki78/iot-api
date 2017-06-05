@@ -21,4 +21,3 @@ monolog:
             type: console
 doctrine:
     dbal:
-        url: "%database_url%"

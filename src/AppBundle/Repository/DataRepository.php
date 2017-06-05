@@ -12,9 +12,9 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
 {
     public function findAllByType($type){
         $result = $this->createQueryBuilder('d')
-            ->where('d.type = :type')
+            ->where('d.dtype = :type')
             ->setParameter("type", $type)
-            ->setMaxResults(150000)
+            ->setMaxResults(100000)
 	    ->getQuery()
             ->getResult();
 
@@ -34,7 +34,7 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter("maxLat", $maxLat)
             ->setParameter("minLon", $minLon)
             ->setParameter("maxLon", $maxLon)
-	    ->setMaxResults(150000)
+	    ->setMaxResults(100000)
             ->getQuery()
             ->getResult();
 
@@ -55,7 +55,7 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter("maxLat", $maxLat)
             ->setParameter("minLon", $minLon)
             ->setParameter("maxLon", $maxLon)
-            ->setMaxResults(150000)
+            ->setMaxResults(100000)
             ->getQuery()
             ->getResult();
 
@@ -70,13 +70,13 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
         $result = $this->createQueryBuilder('d')
             ->where('d.latitude BETWEEN :minLat AND :maxLat')
             ->AndWhere('d.longitude BETWEEN :minLon AND :maxLon')
-            ->AndWhere('d.type = :type')
+            ->AndWhere('d.dtype = :type')
             ->setParameter("minLat", $minLat)
             ->setParameter("maxLat", $maxLat)
             ->setParameter("minLon", $minLon)
             ->setParameter("maxLon", $maxLon)
             ->setParameter("type", $type)
-            ->setMaxResults(150000)
+            ->setMaxResults(100000)
             ->getQuery()
             ->getResult();
 
@@ -92,7 +92,7 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
             ->where('d.latitude BETWEEN :minLat AND :maxLat')
             ->AndWhere('d.longitude BETWEEN :minLon AND :maxLon')
             ->AndWhere('d.date BETWEEN :dateD AND :dateF')
-            ->AndWhere('d.type = :type')
+            ->AndWhere('d.dtype = :type')
             ->setParameter("minLat", $minLat)
             ->setParameter("maxLat", $maxLat)
             ->setParameter("minLon", $minLon)
@@ -100,7 +100,7 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter("dateD", $dateD)
             ->setParameter("dateF", $dateF)
             ->setParameter("type", $type)
-	    ->setMaxResults(150000)
+	    ->setMaxResults(100000)
             ->getQuery()
             ->getResult();
 
@@ -122,7 +122,7 @@ class DataRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter("maxLon", $maxLon)
             ->setParameter("dateD", $dateD)
             ->setParameter("dateF", $dateF)
-            ->setMaxResults(150000)
+            ->setMaxResults(100000)
             ->getQuery()
             ->getResult();
 
