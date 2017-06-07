@@ -21,66 +21,8 @@ use Doctrine\DBAL\Exception\ConstraintViolationException;
 class DataController extends Controller
 {
 
-//    /**
-//     * @Route("/getAll")
-//     * @Method({"GET","HEAD"})
-//     */
-//    public function getAll($latitude = '48.856614', $longitude = '2.352222', $deltaLatitude = '1', $deltaLongitude = '1', $dateMin = NULL, $dateMax = NULL, $typeData = 'PF')
-//    {
-//        $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findAll();
-//        $result = [];
-//        foreach ($datas as $key => $data) {
-//            $line['date'] = $data->getDate();
-//            $line['longitude'] = $data->getLongitude();
-//            $line['latitude'] = $data->getLatitude();
-//            $line['type'] = $data->getType();
-//            $line['valeur'] = $data->getValeur();
-//            $result[] = $line;
-//        }
-//
-//        return new JsonResponse($result);
-//    }
-
-    /**
-     * @Route("/getAllByType/{typeData}")
-     * @Method({"GET","HEAD"})
-     */
-    public function getAllByType($latitude = '48.856614', $longitude = '2.352222', $deltaLatitude = '1', $deltaLongitude = '1', $dateMin = NULL, $dateMax = NULL, $typeData = 'PF')
-    {
 
 
-
-        $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findAllByType($typeData);
-	
-        $result = [];
-        foreach ($datas as $key => $data) {
-            $line['date'] = $data->getDate();
-            $line['longitude'] = $data->getLongitude();
-            $line['latitude'] = $data->getLatitude();
-            $line['valeur'] = $data->getValeur();
-            $result[] = $line;
-        }
-        return new JsonResponse($result);
-    }
-
-
-    /**
-     * @Route("/getByLocalisation/{latitude}/{longitude}/{deltaLat}/{deltaLon}")
-     * @Method({"GET","HEAD"})
-     */
-    public function getByLocalisation($latitude = '48.856614', $longitude = '2.352222', $deltaLat = '1', $deltaLon = '1', $dateMin = NULL, $dateMax = NULL, $typeData = 'PF')
-    {
-        $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findByLocalisation($latitude, $longitude, $deltaLat, $deltaLon);
-        $result = [];
-        foreach ($datas as $key => $data) {
-            $line['date'] = $data->getDate();
-            $line['longitude'] = $data->getLongitude();
-            $line['latitude'] = $data->getLatitude();
-            $line['valeur'] = $data->getValeur();
-            $result[] = $line;
-        }
-        return new JsonResponse($result);
-    }
 //{long}{dLat}{dLong}{dateD}{dateF}{type}
     /**
      * @Route("/getBy/")
@@ -89,7 +31,7 @@ class DataController extends Controller
     public function getBy(Request $request)
     {
 
-	ini_set("memory_limit","512M");
+        ini_set("memory_limit", "512M");
         $lat = $request->query->get('lat');
         $long = $request->query->get('long');
         $dLat = $request->query->get('dLat');
@@ -97,13 +39,10 @@ class DataController extends Controller
         $dateD = $request->query->get('dateD');
         $dateF = $request->query->get('dateF');
         $type = $request->query->get('type');
-	$lat = (int)$lat;
-	$long = (int)$long;
-	$dLat =(int)$dLat;
-	$dLong = (int)$dLong;
+
 
         try {
-            $dbh = new \PDO("pgsql:dbname=iotapi;host=192.168.1.26", 'iotapi', 'iotapi');
+            $dbh = new \PDO("pgsql:dbname=iotapi;host=lpdw.ddns.net", 'iotapi', 'iotapi');
 //            $dbh = new \PDO('mysql:host=192.168.1.26;dbname=iotapi', 'iotapi', 'iotapi');
         } catch (\PDOException $e) {
             print "Erreur !: " . $e->getMessage() . "<br/>";
@@ -114,63 +53,57 @@ class DataController extends Controller
         $minLon = $long - $dLong;
         $maxLon = $long + $dLong;
 
-        $sql = 'SELECT longitude,latitude,dtype as type,valeur FROM data WHERE latitude BETWEEN :minLat AND :maxLat AND longitude BETWEEN :minLon AND :maxLon AND dtype=:dtype LIMIT 100000';
+
+        $lattitudeNordEst = $lat + $dLat;
+        $lattitudeSouthWest = $lat - $dLat;
+
+        $longitudeNordEst = $long + $dLong;
+        $longitudeSouthWest = $long - $dLong;
+
+        $parts = 10;
+
+        $deltaLat = ($lattitudeNordEst - $lattitudeSouthWest) / $parts;
+        $deltaLon = ($longitudeNordEst - $longitudeSouthWest) / $parts;
+        $sql = '';
+        $values = [];
+
+        for ($i = 0; $i < $parts; $i++) {
+            $maxLat = $lattitudeNordEst - $i * $deltaLat;
+            $minLat = $maxLat - $deltaLat;
+            for ($j = 0; $j < $parts; $j++) {
+                $maxLon = $longitudeNordEst - $j * $deltaLon;
+                $minLon = $maxLon - $deltaLon;
+                if (!($i == 0 && $j == 0)) {
+                    $sql .= " UNION ALL ";
+                }
+                $values['minLat' . $i . $j] = $minLat;
+                $values['maxLat' . $i . $j] = $maxLat;
+                $values['minLon' . $i . $j] = $minLon;
+                $values['maxLon' . $i . $j] = $maxLon;
+
+                $sql .= '(SELECT AVG(latitude) as latitude,AVG(longitude) as longitude,AVG(valeur) as valeur FROM data WHERE latitude BETWEEN :minLat' . $i . $j . ' AND :maxLat' . $i . $j . ' AND longitude BETWEEN :minLon' . $i . $j . ' AND :maxLon' . $i . $j . ' AND dtype=:dtype)';
+
+            }
+        }
+
         $rs = $dbh->prepare($sql);
-        $rs->execute([':minLat' => $minLat, ':maxLat' => $maxLat, ':minLon' => $minLon, ':maxLon' => $maxLon, ':dtype' => $type]);
-        $result[] = $rs->fetchAll(\PDO::FETCH_ASSOC);
 
-//        dump($result);die;
-//        dump($result);
-//        $sansCond = $dbh->prepare("SELECT 'id' FROM 'iotapi.data' LIMIT 1000");
-//        $result2 = $sansCond->fetchAll(\PDO::FETCH_ASSOC);
-//        dump($result2);die;
-//
-//        if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD == NULL && $dateF == NULL && $type == NULL){
-//            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDelta((int)$lat,(int)$long,(int)$dLat,(int)$dLong);
-//
-//
-//        }
-//        if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD == NULL && $dateF == NULL && $type != NULL){
-//            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDeltaType($lat,$long,$dLat,$dLong,$type);
-//        }
-//        else if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD != NULL && $dateF == NULL && $type == NULL){
-//            $dateF = new \DateTime();
-//            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDeltaDate($lat,$long,$dLat,$dLong,$dateD,$dateF);
-//        }
-//        else if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD != NULL && $dateF != NULL && $type == NULL){
-//            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDeltaDate($lat,$long,$dLat,$dLong,$dateD,$dateF);
-//        }
-//        else if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD == NULL && $dateF == NULL && $type != NULL){
-//            $dateF = new \DateTime();
-//            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDeltaDateType($lat,$long,$dLat,$dLong,$dateD,$dateF,$type);
-//        }
-//
-//        else if($lat != NULL && $long != NULL && $dLat != NULL && $dLong != NULL && $dateD != NULL && $dateF != NULL && $type != NULL){
-//            $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findWithDeltaDateType($lat,$long,$dLat,$dLong,$dateD,$dateF,$type);
-//        }
-//        $result = [];
-//        foreach ($datas as $key => $data) {
-//            $line['date'] = $data->getDate();
-//            $line['longitude'] = $data->getLongitude();
-//            $line['latitude'] = $data->getLatitude();
-//            $line['type'] = $data->getDtype();
-//            $line['valeur'] = $data->getValeur();
-//            $result[] = $line;
-//        }
+        foreach ($values as $key => $value) {
+            $rs->bindValue(':' . $key, $value);
+        }
+        $rs->bindValue(':dtype', $type);
 
+        $rs->execute();
 
-        return new JsonResponse($result[0]);
+        $tmpResult[] = $rs->fetchAll(\PDO::FETCH_ASSOC);
+        $result = [];
+        for ($i = 0; $i < count($tmpResult[0]); $i++) {
+            if($tmpResult[0][$i]['latitude'] != NULL){
+                $tmpResult[0][$i]['type'] = $type;
+                $result[] = $tmpResult[0][$i];
+            }
+        }
 
-
-//        $datas = $this->getDoctrine()->getRepository('AppBundle:Data')->findByLocalisation($latitude, $longitude, $deltaLat, $deltaLon);
-//        $result = [];
-//        foreach ($datas as $key => $data) {
-//            $line['date'] = $data->getDate();
-//            $line['longitude'] = $data->getLongitude();
-//            $line['latitude'] = $data->getLatitude();
-//            $line['valeur'] = $data->getValeur();
-//            $result[] = $line;
-//        }
         return new JsonResponse($result);
     }
 
@@ -192,10 +125,10 @@ class DataController extends Controller
 
                     if ($key == 'date') {
                         $transitionToDst = $value;
-                        try{
+                        try {
                             $date = new \DateTime($transitionToDst);
 
-                        } catch (Exception $e){
+                        } catch (Exception $e) {
                             return new JsonResponse($e);
                         }
                         $CO2->setDate($date);
@@ -227,13 +160,13 @@ class DataController extends Controller
                 }
 
                 $em = $this->getDoctrine()->getManager();
-                try{
+                try {
                     $em->persist($CO2);
                     $em->persist($PF);
 
                     $em->flush();
-                } catch (ConstraintViolationException $e){
-                    return new Response('Estatus code 400',400);
+                } catch (ConstraintViolationException $e) {
+                    return new Response('Estatus code 400', 400);
                 }
 
 
